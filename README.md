@@ -1,8 +1,9 @@
 
 # NeuPhysics: Editable Neural Geometry and Physics from Monocular Videos
 
-[Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://www.alexandergao.com/), [Ming C. Lin](https://www.cs.umd.edu/~lin/), 
- [[Paper]](https://drive.google.com/file/d/1zi_pKAR9tQ3XYQV4dkFF6eAh2n9kEoHI/view) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
+[Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://www.alexandergao.com/), [Ming C. Lin](https://www.cs.umd.edu/~lin/)
+
+[[Paper]](https://drive.google.com/file/d/1zi_pKAR9tQ3XYQV4dkFF6eAh2n9kEoHI/view) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
 
 
 ### Setup
@@ -29,6 +30,9 @@ pip install -r requirements.txt
   - PyMCubes==0.1.2
 
 </details>
+
+### Data
+We will upload our data and pretrained model soon.
 
 ### Running
 
