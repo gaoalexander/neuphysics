@@ -1,23 +1,9 @@
-# NeuPhysics
 
-#### Data Convention
-The data is organized as follows:
+# NeuPhysics: Editable Neural Geometry and Physics from Monocular Videos
 
-```
-<case_name>
-|-- cameras_xxx.npz    # camera parameters
-|-- sparse_points_interest.ply    # contains scene ROI
-|-- image
-    |-- 000.png        # target image for each view
-    |-- 001.png
-    ...
-|-- mask
-    |-- 000.png        # target mask each view (For unmasked setting, set all pixels as 255)
-    |-- 001.png
-    ...
-```
+[Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://www.alexandergao.com/), [Ming C. Lin](https://www.cs.umd.edu/~lin/), 
+ [[Paper]](https://drive.google.com/file/d/1zi_pKAR9tQ3XYQV4dkFF6eAh2n9kEoHI/view) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
 
-Here the `cameras_xxx.npz` follows the data format in [IDR](https://github.com/lioryariv/idr/blob/main/DATA_CONVENTION.md), where `world_mat_xx` denotes the world to image projection matrix, and `scale_mat_xx` denotes the normalization matrix.
 
 ### Setup
 
@@ -72,31 +58,58 @@ The corresponding image set of view interpolation can be found in `exp/<case_nam
 
 More information can be found in [preprocess_custom_data](https://github.com/Totoro97/NeuS/tree/main/preprocess_custom_data).
 
+### Data Convention
+The data is organized as follows:
+
+```
+<case_name>
+|-- cameras_xxx.npz    # camera parameters
+|-- sparse_points_interest.ply    # contains scene ROI
+|-- image
+    |-- 000.png        # target image for each view
+    |-- 001.png
+    ...
+|-- mask
+    |-- 000.png        # target mask each view (For unmasked setting, set all pixels as 255)
+    |-- 001.png
+    ...
+```
+
+Here the `cameras_xxx.npz` follows the data format in [IDR](https://github.com/lioryariv/idr/blob/main/DATA_CONVENTION.md), where `world_mat_xx` denotes the world to image projection matrix, and `scale_mat_xx` denotes the normalization matrix.
+
 ## Citation
 
 If you find this repository helpful, please consider citing our paper as well as others that our work built upon:
 
 ```
-@article{qiaoandgao2022neuphysics,
-  title={NeuPhysics: Editable Neural Geometry and Physics from Monocular Videos},
-  author={Qiao, Yi-Ling and Gao, Alexander and Lin, Ming},
-  journal={ #TODO },
-  year={2022}
+@inproceedings{qiao2022neuphysics,
+    author  = {Qiao, Yi-Ling and Gao, Alexander and Lin, Ming C.},
+    title  = {NeuPhysics: Editable Neural Geometry and Physics from Monocular Videos},
+    booktitle = {Conference on Neural Information Processing Systems (NeurIPS)},
+    year  = {2022},
 }
+
 @article{wang2021neus,
-  title={NeuS: Learning Neural Implicit Surfaces by Volume Rendering for Multi-view Reconstruction},
-  author={Wang, Peng and Liu, Lingjie and Liu, Yuan and Theobalt, Christian and Komura, Taku and Wang, Wenping},
-  journal={arXiv preprint arXiv:2106.10689},
-  year={2021}
+      title={NeuS: Learning Neural Implicit Surfaces by Volume Rendering for Multi-view Reconstruction}, 
+      author={Peng Wang and Lingjie Liu and Yuan Liu and Christian Theobalt and Taku Komura and Wenping Wang},
+    journal={NeurIPS},
+      year={2021}
 }
-@misc{tretschk2020nonrigid,
-      title={Non-Rigid Neural Radiance Fields: Reconstruction and Novel View Synthesis of a Dynamic Scene From Monocular Video},
-      author={Edgar Tretschk and Ayush Tewari and Vladislav Golyanik and Michael Zollhöfer and Christoph Lassner and Christian Theobalt},
-      year={2020},
-      eprint={2012.12247},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+
+@inproceedings{tretschk2021nonrigid,
+    title = {Non-Rigid Neural Radiance Fields: Reconstruction and Novel View Synthesis of a Dynamic Scene From Monocular Video},
+    author = {Tretschk, Edgar and Tewari, Ayush and Golyanik, Vladislav and Zollh\"{o}fer, Michael and Lassner, Christoph and Theobalt, Christian},
+    booktitle = {{IEEE} International Conference on Computer Vision ({ICCV})},
+    year = {2021},
 }
+
+@article{du2021_diffpd,
+    author = {Du, Tao and Wu, Kui and Ma, Pingchuan and Wah, Sebastien and Spielberg, Andrew and Rus, Daniela and Matusik, Wojciech},
+    title = {DiffPD: Differentiable Projective Dynamics},
+    year = {2021},
+    journal = {ACM Trans. Graph.},
+}
+         
 ```
 
 ## Acknowledgement
