@@ -5,7 +5,7 @@ import numpy as np
 from models.embedder import get_embedder
 
 
-# This implementation is borrowed from IDR: https://github.com/lioryariv/idr
+# This implementation is partially borrowed from IDR: https://github.com/lioryariv/idr
 class SDFNetwork(nn.Module):
     def __init__(self,
                  d_in,
@@ -23,11 +23,13 @@ class SDFNetwork(nn.Module):
                  bending_latent_size=32):
         super(SDFNetwork, self).__init__()
 
-        dims = [d_in] + [d_hidden for _ in range(n_layers)] + [d_out]
-
         self.bending_network = [bending_network]
         self.bending_latent_size = bending_latent_size
         self.embed_fn_fine = None
+        self.skip_in = skip_in
+        self.scale = scale
+
+        dims = [d_in] + [d_hidden for _ in range(n_layers)] + [d_out]
 
         if multires > 0:
             embed_fn, input_ch = get_embedder(multires, input_dims=d_in)
@@ -35,8 +37,6 @@ class SDFNetwork(nn.Module):
             dims[0] = input_ch
 
         self.num_layers = len(dims)
-        self.skip_in = skip_in
-        self.scale = scale
 
         for l in range(0, self.num_layers - 1):
             if l + 1 in self.skip_in:
@@ -113,7 +113,7 @@ class SDFNetwork(nn.Module):
         return gradients.unsqueeze(1)
 
 
-# This implementation is borrowed from IDR: https://github.com/lioryariv/idr
+# This implementation is partially borrowed from IDR: https://github.com/lioryariv/idr
 class RenderingNetwork(nn.Module):
     def __init__(self,
                  d_feature,
@@ -131,7 +131,6 @@ class RenderingNetwork(nn.Module):
 
         self.bending_network = [bending_network]
         self.bending_latent_size = bending_latent_size
-
         self.mode = mode
         self.squeeze_out = squeeze_out
         dims = [d_in + d_feature] + [d_hidden for _ in range(n_layers)] + [d_out]
@@ -245,23 +244,23 @@ class NeRF(nn.Module):
         if self.embed_fn_view is not None:
             input_views = self.embed_fn_view(input_views)
 
-        h = input_pts
+        x = input_pts
         for i, l in enumerate(self.pts_linears):
-            h = self.pts_linears[i](h)
-            h = F.relu(h)
+            x = self.pts_linears[i](x)
+            x = F.relu(x)
             if i in self.skips:
-                h = torch.cat([input_pts, h], -1)
+                x = torch.cat([input_pts, x], -1)
 
         if self.use_viewdirs:
-            alpha = self.alpha_linear(h)
-            feature = self.feature_linear(h)
-            h = torch.cat([feature, input_views], -1)
+            alpha = self.alpha_linear(x)
+            feature = self.feature_linear(x)
+            x = torch.cat([feature, input_views], -1)
 
             for i, l in enumerate(self.views_linears):
-                h = self.views_linears[i](h)
-                h = F.relu(h)
+                x = self.views_linears[i](x)
+                x = F.relu(x)
 
-            rgb = self.rgb_linear(h)
+            rgb = self.rgb_linear(x)
             return alpha, rgb
         else:
             assert False
@@ -287,7 +286,7 @@ class BendingNetwork(nn.Module):
         super(BendingNetwork, self).__init__()
         self.use_positionally_encoded_input = False
         self.input_ch = 3
-        self.output_ch = 3  # don't change
+        self.output_ch = 3
         self.bending_latent_size = bending_latent_size
         self.use_rigidity_network = True
         self.rigidity_hidden_dimensions = rigidity_hidden_dimensions
@@ -379,8 +378,7 @@ class BendingNetwork(nn.Module):
                     self.rigidity_network[-1].bias.data *= 0.0
 
     def forward(self, input_pts, input_latent, details=None, special_loss_return=False):
-        raw_input_pts = input_pts[:,
-                        :3]  # positional encoding includes the raw 3D coordinates as the first three entries
+        raw_input_pts = input_pts[:, :3]  # positional encoding includes raw 3D coordinates as first three entries
 
         if self.embed_fn_fine is not None:
             input_pts = self.embed_fn_fine(input_pts)
@@ -389,40 +387,35 @@ class BendingNetwork(nn.Module):
             details = {}
 
         input_latents = input_latent.expand(input_pts.size()[0], -1)
-
-        # fully-connected network regresses offset
-        h = torch.cat([input_pts, input_latents], -1)
+        x = torch.cat([input_pts, input_latents], -1)
 
         for i, layer in enumerate(self.network):
-            h = layer(h)
+            x = layer(x)
             # SIREN
             if self.activation_function.__name__ == "sin" and i == 0:
-                h *= 30.0
-            if i != len(
-                    self.network) - 1:  # no activation function after last layer (Relu prevents backprop if the
-                # input is zero & need offsets in positive and negative directions)
-                h = self.activation_function(h)
+                x *= 30.0
+            if i != len(self.network) - 1:
+                x = self.activation_function(x)
             if i in self.skips:
-                h = torch.cat([input_pts, h], -1)
+                x = torch.cat([input_pts, x], -1)
 
-        unmasked_offsets = h
+        unmasked_offsets = x
         if details is not None:
             details["unmasked_offsets"] = unmasked_offsets
 
         if self.use_rigidity_network:
-            h = input_pts
+            x = input_pts
             for i, layer in enumerate(self.rigidity_network):
-                h = layer(h)
-
+                x = layer(x)
                 # SIREN
                 if self.rigidity_activation_function.__name__ == "sin" and i == 0:
-                    h *= 30.0
+                    x *= 30.0
                 if i != len(self.rigidity_network) - 1:
-                    h = self.rigidity_activation_function(h)
+                    x = self.rigidity_activation_function(x)
                 if i in self.rigidity_skips:
-                    h = torch.cat([input_pts, h], -1)
+                    x = torch.cat([input_pts, x], -1)
 
-            rigidity_mask = (self.rigidity_tanh(h) + 1) / 2  # close to 1 for nonrigid, close to 0 for rigid
+            rigidity_mask = (self.rigidity_tanh(x) + 1) / 2  # close to 1 for nonrigid, close to 0 for rigid
 
             if self.rigidity_test_time_cutoff is not None:
                 rigidity_mask[rigidity_mask <= self.rigidity_test_time_cutoff] = 0.0
@@ -442,5 +435,5 @@ class BendingNetwork(nn.Module):
 
         if special_loss_return:  # used for compute_divergence_loss()
             return details
-        else:  # default
-            return new_points  # apply positional encoding. num_points x input_ch
+        else:
+            return new_points

@@ -1,7 +1,5 @@
- 
-
+### The following instructions are directly from the [NeuS repository](https://github.com/Totoro97/NeuS/tree/main/preprocess_custom_data), and are included here for convenience.
 # Training NeuS Using Your Custom Data
-
 
 
 ### [Example data link](https://drive.google.com/file/d/1nZBY--rvi3dUKGVz-d1jCpppkeD_tBiB/view?usp=sharing)

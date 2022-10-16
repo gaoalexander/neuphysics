@@ -1,9 +1,9 @@
 
 # NeuPhysics: Editable Neural Geometry and Physics from Monocular Videos
 
-[Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://www.alexandergao.com/), [Ming C. Lin](https://www.cs.umd.edu/~lin/)
+[Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://gaoalexander.github.io/), [Ming C. Lin](https://www.cs.umd.edu/~lin/)
 
-[[Paper]](https://drive.google.com/file/d/1zi_pKAR9tQ3XYQV4dkFF6eAh2n9kEoHI/view) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
+[[Paper]](https://openreview.net/pdf?id=QXLue5WoSBE) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
 
 
 ### Setup
@@ -42,10 +42,16 @@ We will upload our data and pretrained model soon.
 python run.py --mode train --conf ./confs/neuphysics_default.conf --case <case_name>
 ```
 
-- **Extract surface from trained model** 
+- **Extract surface from trained model for single frame/timestep** 
 
 ```shell
-python run.py --mode validate_mesh --conf <config_file> --case <case_name> --is_continue # use latest checkpoint
+python run.py --mode validate_mesh --val_frame_idx <frame_index> --conf <config_file> --case <case_name> --is_continue # use latest checkpoint
+```
+
+- **Extract surface from trained model for entire motion sequence** 
+
+```shell
+python run.py --mode validate_mesh_sequence --conf <config_file> --case <case_name> --is_continue # use latest checkpoint
 ```
 
 The corresponding mesh can be found in `exp/<case_name>/<exp_name>/meshes/<iter_steps>.ply`.

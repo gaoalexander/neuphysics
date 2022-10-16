@@ -202,7 +202,8 @@ class Runner:
             eikonal_loss = gradient_error
             mask_loss = F.binary_cross_entropy(weight_sum.clip(1e-3, 1.0 - 1e-3), mask)
 
-            bending_net_details = self.bending_network(input_points, self.bending_latents_list[image_idx],
+            bending_net_details = self.bending_network(input_points,
+                                                       self.bending_latents_list[image_idx],
                                                        special_loss_return=True)
             offsets_loss = self.compute_offsets_loss(bending_net_details, weights)
             divergence_loss = self.compute_divergence_loss(bending_net_details,
@@ -446,6 +447,9 @@ class Runner:
         return img_fine
 
     def fore_back_ground(self, image_idx, world_space=False, resolution=64, threshold=0.0, rigidity_threshold=0.5):
+        """
+        Export a mesh with foreground separated from background, based on rigidity mask threshold and scene bounding box
+        """
         print("fore_back_ground")
 
         pcd = trimesh.load(os.path.join(self.dataset.data_dir, 'sparse_points_interest.ply'))
@@ -548,8 +552,6 @@ class Runner:
         video_dir = os.path.join(self.base_exp_dir, 'render')
         os.makedirs(video_dir, exist_ok=True)
 
-        # for i in range(n_frames):
-        #     print(i)
         image = self.render_original_motion(img_idx_0,
                                             img_idx_1,
                                             np.sin(((i / n_frames) - 0.5) * np.pi) * 0.5 + 0.5,
@@ -575,7 +577,6 @@ if __name__ == '__main__':
     parser.add_argument('--is_continue', default=False, action="store_true")
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--case', type=str, default='')
-
     args = parser.parse_args()
 
     torch.cuda.set_device(args.gpu)
@@ -583,20 +584,24 @@ if __name__ == '__main__':
 
     if args.mode == 'train':
         runner.train()
+
     elif args.mode == 'validate_mesh':
         runner.validate_mesh(image_idx=args.val_frame_idx,
                              world_space=True,
                              resolution=512,
                              threshold=args.mcube_threshold,
                              rigidity_test_time_cutoff=args.val_rigidity_threshold)
+
     elif args.mode == 'validate_image':
         runner.validate_image(idx=args.val_frame_idx)
+
     elif args.mode == 'fore_back_ground':
         runner.fore_back_ground(image_idx=args.val_frame_idx,
                                 world_space=True,
                                 resolution=512,
                                 threshold=args.mcube_threshold,
                                 rigidity_threshold=args.val_rigidity_threshold)
+
     elif args.mode == 'validate_mesh_sequence':
         n_frames = runner.dataset.n_images
         for i in range(n_frames):
@@ -606,17 +611,20 @@ if __name__ == '__main__':
                                     resolution=512,
                                     threshold=args.mcube_threshold,
                                     rigidity_threshold=args.val_rigidity_threshold)
+
     elif args.mode == 'validate_image_sequence':
         n_frames = runner.dataset.n_images
         for i in range(n_frames):
             print("Validating image {}/{}...".format(i, n_frames - 1))
             runner.interpolate_view(i, i, n_frames=1)
+
     elif args.mode == 'validate_image_sequence_original_motion':
         n_frames = runner.dataset.n_images
         for i in range(n_frames):
             print("Validating image {}/{}...".format(i, n_frames - 1))
             runner.original_motion(i, i, n_frames=1, timestep=i)
     elif args.mode.startswith('interpolate'):  # Interpolate views given two image indices
+
         n_frames = runner.dataset.n_images
         _, img_idx_0, img_idx_1 = args.mode.split('_')
         img_idx_0 = int(img_idx_0)
