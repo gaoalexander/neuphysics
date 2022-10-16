@@ -7,6 +7,7 @@
 
 
 ### Setup
+**This code has been tested on Ubuntu 20.04 with CUDA 11.3**
 
 Clone this repository and install dependencies. (Recommended to create a new conda env or pipenv.)
 
@@ -31,8 +32,6 @@ pip install -r requirements.txt
   - scikit-image=0.19.2
 
 </details>
-
-This code has been tested on Ubuntu 20.04 with CUDA 11.3
 
 ### Data
 We will upload our data and pretrained model soon.
