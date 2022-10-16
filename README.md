@@ -8,7 +8,7 @@
 
 ### Setup
 
-Clone this repository
+Clone this repository and install dependencies. (Recommended to create a new conda env or pipenv.)
 
 ```shell
 git clone https://github.com/YilingQiao/NeuPhysics.git
@@ -18,18 +18,21 @@ pip install -r requirements.txt
 
 <details>
   <summary> Dependencies (click to expand) </summary>
-
-  - torch==1.8.0
-  - opencv_python==4.5.2.52
-  - trimesh==3.9.8 
-  - numpy==1.19.2
+  - torch==1.11.0
+  - opencv_python==4.5.5.64
+  - trimesh==3.9.8
+  - numpy==1.21.2
   - pyhocon==0.3.57
   - icecream==2.1.0
   - tqdm==4.50.2
   - scipy==1.7.0
   - PyMCubes==0.1.2
+  - imageio=2.16.1
+  - scikit-image=0.19.2
 
 </details>
+
+This code has been tested on Ubuntu 20.04 with CUDA 11.3
 
 ### Data
 We will upload our data and pretrained model soon.
