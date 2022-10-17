@@ -281,7 +281,8 @@ class BendingNetwork(nn.Module):
                  multires,
                  bending_latent_size,
                  rigidity_hidden_dimensions,
-                 rigidity_network_depth):
+                 rigidity_network_depth,
+                 rigidity_use_latent=False):
 
         super(BendingNetwork, self).__init__()
         self.use_positionally_encoded_input = False
@@ -291,6 +292,7 @@ class BendingNetwork(nn.Module):
         self.use_rigidity_network = True
         self.rigidity_hidden_dimensions = rigidity_hidden_dimensions
         self.rigidity_network_depth = rigidity_network_depth
+        self.rigidity_use_latent = rigidity_use_latent
 
         # simple scene editing. set to None during training.
         self.rigidity_test_time_cutoff = None
@@ -305,7 +307,6 @@ class BendingNetwork(nn.Module):
         if multires > 0:
             embed_fn, self.input_ch = get_embedder(multires, input_dims=d_in)
             self.embed_fn_fine = embed_fn
-            # dims[0] = input_ch
 
         self.network = nn.ModuleList(
             [nn.Linear(self.input_ch + self.bending_latent_size, self.hidden_dimensions)] +
@@ -345,13 +346,22 @@ class BendingNetwork(nn.Module):
             use_last_layer_bias = True
             self.rigidity_tanh = nn.Tanh()
 
-            self.rigidity_network = nn.ModuleList(
-                [nn.Linear(self.input_ch, self.rigidity_hidden_dimensions)] +
-                [nn.Linear(self.input_ch + self.rigidity_hidden_dimensions, self.rigidity_hidden_dimensions)
-                 if i + 1 in self.rigidity_skips
-                 else nn.Linear(self.rigidity_hidden_dimensions, self.rigidity_hidden_dimensions)
-                 for i in range(self.rigidity_network_depth - 2)] +
-                [nn.Linear(self.rigidity_hidden_dimensions, 1, bias=use_last_layer_bias)])
+            if self.rigidity_use_latent:
+                self.rigidity_network = nn.ModuleList(
+                    [nn.Linear(self.input_ch + self.bending_latent_size, self.rigidity_hidden_dimensions)] +
+                    [nn.Linear(self.input_ch + self.rigidity_hidden_dimensions, self.rigidity_hidden_dimensions)
+                     if i + 1 in self.rigidity_skips
+                     else nn.Linear(self.rigidity_hidden_dimensions, self.rigidity_hidden_dimensions)
+                     for i in range(self.rigidity_network_depth - 2)] +
+                    [nn.Linear(self.rigidity_hidden_dimensions, 1, bias=use_last_layer_bias)])
+            else:
+                self.rigidity_network = nn.ModuleList(
+                    [nn.Linear(self.input_ch, self.rigidity_hidden_dimensions)] +
+                    [nn.Linear(self.input_ch + self.rigidity_hidden_dimensions, self.rigidity_hidden_dimensions)
+                     if i + 1 in self.rigidity_skips
+                     else nn.Linear(self.rigidity_hidden_dimensions, self.rigidity_hidden_dimensions)
+                     for i in range(self.rigidity_network_depth - 2)] +
+                    [nn.Linear(self.rigidity_hidden_dimensions, 1, bias=use_last_layer_bias)])
 
             # initialize weights
             with torch.no_grad():
@@ -404,7 +414,11 @@ class BendingNetwork(nn.Module):
             details["unmasked_offsets"] = unmasked_offsets
 
         if self.use_rigidity_network:
-            x = input_pts
+            if self.rigidity_use_latent:
+                x = torch.cat([input_pts, input_latents], -1)
+            else:
+                x = input_pts
+
             for i, layer in enumerate(self.rigidity_network):
                 x = layer(x)
                 # SIREN
