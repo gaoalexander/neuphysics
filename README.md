@@ -5,6 +5,8 @@
 
 [[Paper]](https://openreview.net/pdf?id=QXLue5WoSBE) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
 
+![](./images/neuphysics_thumbnail_1.gif)
+![](./images/neuphysics_thumbnail_2.gif)
 
 ### Setup
 **This code has been tested on Ubuntu 20.04 with CUDA 11.3**
