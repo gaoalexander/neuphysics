@@ -4,13 +4,13 @@
 [Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://gaoalexander.github.io/), [Ming C. Lin](https://www.cs.umd.edu/~lin/)
 
 ## [Paper](https://openreview.net/pdf?id=QXLue5WoSBE) | [Project Page](https://sites.google.com/view/neuphysics/home) | [Video](https://www.youtube.com/watch?v=Eklh1pIAri0)
-____________
+
 We present a method for learning 3D geometry and physics parameters of a dynamic scene from only a monocular RGB video input.
 
 ![](./images/neuphysics_thumbnail_1.gif)
 ![](./images/neuphysics_thumbnail_2.gif)
-____________
-### Setup
+
+## Setup
 **This code has been tested on Ubuntu 20.04 with CUDA 11.3**
 
 Clone this repository and install dependencies. (Recommended to create a new conda env or pipenv.)
@@ -37,12 +37,31 @@ pip install -r requirements.txt
 
 </details>
 
-### Data
+## Data
 Download data and pretrained model weights on [Google Drive](https://drive.google.com/drive/folders/1PGHkcNolUZ3ld_e5jFtr8OB5_EMWB4sR?usp=sharing).
 
 Extract `public_data` and `exp` directories into the top-level `neuphysics` directory.
 
-### Running
+### Data Convention
+The data is organized as follows:
+
+```
+<case_name>
+|-- cameras_xxx.npz    # camera parameters
+|-- sparse_points_interest.ply    # contains scene ROI
+|-- image
+    |-- 000.png        # target image for each view
+    |-- 001.png
+    ...
+|-- mask
+    |-- 000.png        # target mask each view (For unmasked setting, set all pixels as 255)
+    |-- 001.png
+    ...
+```
+
+Here the `cameras_xxx.npz` follows the data format in [IDR](https://github.com/lioryariv/idr/blob/main/DATA_CONVENTION.md), where `world_mat_xx` denotes the world to image projection matrix, and `scale_mat_xx` denotes the normalization matrix.
+
+## Running
 
 - **Training without mask**
 
@@ -72,28 +91,9 @@ python run.py --mode interpolate_<img_idx_0>_<img_idx_1> --conf <config_file> --
 
 The corresponding image set of view interpolation can be found in `exp/<case_name>/<exp_name>/render/`.
 
-### Train NeuPhysics with your own data
+## Train NeuPhysics with your own data
 
 More information can be found in [preprocess_custom_data](https://github.com/Totoro97/NeuS/tree/main/preprocess_custom_data).
-
-### Data Convention
-The data is organized as follows:
-
-```
-<case_name>
-|-- cameras_xxx.npz    # camera parameters
-|-- sparse_points_interest.ply    # contains scene ROI
-|-- image
-    |-- 000.png        # target image for each view
-    |-- 001.png
-    ...
-|-- mask
-    |-- 000.png        # target mask each view (For unmasked setting, set all pixels as 255)
-    |-- 001.png
-    ...
-```
-
-Here the `cameras_xxx.npz` follows the data format in [IDR](https://github.com/lioryariv/idr/blob/main/DATA_CONVENTION.md), where `world_mat_xx` denotes the world to image projection matrix, and `scale_mat_xx` denotes the normalization matrix.
 
 ## Citation
 
