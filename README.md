@@ -5,6 +5,8 @@
 
 [[Paper]](https://openreview.net/pdf?id=QXLue5WoSBE) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
 
+We present a method for learning 3D geometry and physics parameters of a dynamic scene from only a monocular RGB video input. 
+
 ![](./images/neuphysics_thumbnail_1.gif)
 ![](./images/neuphysics_thumbnail_2.gif)
 
