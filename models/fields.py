@@ -298,8 +298,8 @@ class BendingNetwork(nn.Module):
         self.rigidity_test_time_cutoff = None
         self.test_time_scaling = None
         self.activation_function = F.relu  # F.relu, torch.sin
-        self.hidden_dimensions = 64  # 32
-        self.network_depth = 5  # 3 # at least 2: input -> hidden -> output
+        self.hidden_dimensions = 64
+        self.network_depth = 5
         self.skips = []  # do not include 0 and do not include depth-1
         use_last_layer_bias = False
 

@@ -3,13 +3,13 @@
 
 [Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://gaoalexander.github.io/), [Ming C. Lin](https://www.cs.umd.edu/~lin/)
 
-[[Paper]](https://openreview.net/pdf?id=QXLue5WoSBE) [[GitHub]](https://sites.google.com/view/neuphysics/home) [[Project]](https://sites.google.com/view/neuphysics/home) [[Video]](https://www.youtube.com/watch?v=Eklh1pIAri0)
-
-We present a method for learning 3D geometry and physics parameters of a dynamic scene from only a monocular RGB video input. 
+## [Paper](https://openreview.net/pdf?id=QXLue5WoSBE) | [Project Page](https://sites.google.com/view/neuphysics/home) | [Video](https://www.youtube.com/watch?v=Eklh1pIAri0)
+____________
+We present a method for learning 3D geometry and physics parameters of a dynamic scene from only a monocular RGB video input.
 
 ![](./images/neuphysics_thumbnail_1.gif)
 ![](./images/neuphysics_thumbnail_2.gif)
-
+____________
 ### Setup
 **This code has been tested on Ubuntu 20.04 with CUDA 11.3**
 
@@ -38,7 +38,9 @@ pip install -r requirements.txt
 </details>
 
 ### Data
-We will upload our data and pretrained model soon.
+Download data and pretrained model weights on [Google Drive](https://drive.google.com/drive/folders/1PGHkcNolUZ3ld_e5jFtr8OB5_EMWB4sR?usp=sharing).
+
+Extract `public_data` and `exp` directories into the top-level `neuphysics` directory.
 
 ### Running
 
