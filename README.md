@@ -16,7 +16,7 @@ We present a method for learning 3D geometry and physics parameters of a dynamic
 Clone this repository and install dependencies. (Recommended to create a new conda env or pipenv.)
 
 ```shell
-git clone https://github.com/YilingQiao/NeuPhysics.git
+git clone https://github.com/gaoalexander/neuphysics.git
 cd NeuPhysics
 pip install -r requirements.txt
 ```
