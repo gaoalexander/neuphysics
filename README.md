@@ -3,7 +3,7 @@
 
 [Yi-Ling Qiao*](https://ylqiao.net/), [Alexander Gao*](https://gaoalexander.github.io/), [Ming C. Lin](https://www.cs.umd.edu/~lin/)
 
-## [Paper](https://openreview.net/pdf?id=QXLue5WoSBE) | [Project Page](https://sites.google.com/view/neuphysics/home) | [Video](https://www.youtube.com/watch?v=Eklh1pIAri0)
+## [Paper](https://arxiv.org/abs/2210.12352) | [Project Page](https://sites.google.com/view/neuphysics/home) | [Video](https://www.youtube.com/watch?v=Eklh1pIAri0)
 
 We present a method for learning 3D geometry and physics parameters of a dynamic scene from only a monocular RGB video input.
 
@@ -17,7 +17,7 @@ Clone this repository and install dependencies. (Recommended to create a new con
 
 ```shell
 git clone https://github.com/gaoalexander/neuphysics.git
-cd NeuPhysics
+cd neuphysics
 pip install -r requirements.txt
 ```
 
