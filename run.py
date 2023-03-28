@@ -14,6 +14,7 @@ from models.dataset import Dataset
 from models.fields import RenderingNetwork, SDFNetwork, SingleVarianceNetwork, NeRF, BendingNetwork
 from models.renderer import NeuSRenderer
 
+from models.editor import Editor
 
 class Runner:
     def __init__(self, conf_path, mode='train', case='CASE_NAME', is_continue=False):
@@ -109,6 +110,7 @@ class Runner:
 
         self.renderer.bending_latents = self.bending_latents_list
 
+        self.editor = Editor(self)
         # Backup codes and configs for debug
         if self.mode[:5] == 'train':
             self.file_backup()
@@ -388,6 +390,89 @@ class Runner:
                                         '{:0>8d}_{}_{}.png'.format(self.iter_step, i, idx)),
                            normal_img[..., i])
 
+
+    def train_physics_gravity_warp(self):
+        idx = 0
+        n_frames = 24
+        rigidity_threshold = 0.2
+        sdf_threshold = 0.01
+        device = 'cuda:0'
+        n_sample = 5
+        # frame 0
+        bbox = [
+            0.049, 0.166, -0.044,
+            0.049, 0.166, 0.093,
+            0.049, 0.039, -0.044,
+            0.049, 0.039, 0.093,
+            0.184, 0.166, -0.044,
+            0.184, 0.166, 0.093,
+            0.184, 0.039, -0.044,
+            0.184, 0.039, 0.093
+        ]
+        # # frame 23
+        bbox23 = [
+            0.049, 0.27151, -0.044,
+            0.049, 0.27151, 0.093,
+            0.049, 0.14486, -0.044,
+            0.049, 0.14486, 0.093,
+            0.184, 0.27151, -0.044,
+            0.184, 0.27151, 0.093,
+            0.184, 0.14486, -0.044,
+            0.184, 0.14486, 0.093
+        ]
+        points_ref, eles_ref, tets_ref, v2ts = self.editor.sample_foreground(
+            self.renderer.bending_latents[idx], 
+            n_sample=n_sample, 
+            bbox=bbox,
+            device=device,
+            rigidity_threshold=rigidity_threshold,
+            sdf_threshold=sdf_threshold
+        )
+
+        # os.makedirs(os.path.join(self.base_exp_dir, 'meshes'), exist_ok=True)
+        # mesh = trimesh.Trimesh(points_ref, [])
+        # mesh.export(os.path.join(self.base_exp_dir, 'meshes', 'points_ref.ply'))
+
+        points_23, eles_23, tets, v2ts = self.editor.sample_foreground(
+            self.renderer.bending_latents[idx], 
+            n_sample=n_sample, 
+            bbox=bbox23,
+            device=device,
+            rigidity_threshold=rigidity_threshold,
+            sdf_threshold=sdf_threshold
+        )
+        points_23 = torch.tensor(points_23).cuda().float()
+        
+        self.editor.physics_type = 'ball_gravity' # ball_gravity
+
+        if self.editor.physics_type == 'ball_gravity':
+            opt_var = torch.tensor([0.0], dtype=torch.float64, requires_grad=True)
+            self.physics_optimizer = torch.optim.Adam(
+                [opt_var], lr=0.1)
+
+        physics_epoch = 20
+        for i in range(physics_epoch):
+
+            input_var = torch.cat([
+                torch.tensor([0]),
+                opt_var,
+                torch.tensor([0]),
+                ])
+            # print(input_var.shape)
+
+            self.editor.now_physics_i = i
+            sim_qs, coupling_loss = self.editor.compute_coupling_loss_warp(
+                input_var, points_ref, tets_ref, idx, n_frames)
+            
+            print("======================== epoch {:04d}".format(i))
+            print("optimized and target", sim_qs[-1].mean(0), points_23.mean(0))
+            self.physics_optimizer.zero_grad()
+            coupling_loss.backward()
+            print("opt_var", opt_var)
+
+            self.physics_optimizer.step()
+
+
     def render_novel_image(self, idx_0, idx_1, ratio, timestep, resolution_level):
         """
         Interpolate view between two cameras.
@@ -577,6 +662,8 @@ if __name__ == '__main__':
     parser.add_argument('--is_continue', default=False, action="store_true")
     parser.add_argument('--gpu', type=int, default=0)
     parser.add_argument('--case', type=str, default='')
+    parser.add_argument('--seq', type=str, default='ball3') # ball3 or hand002
+    parser.add_argument('--edit_type', type=str, default='delete_fg') # move_fg delete_fg duplicate_fg
     args = parser.parse_args()
 
     torch.cuda.set_device(args.gpu)
@@ -633,3 +720,6 @@ if __name__ == '__main__':
                                 img_idx_1,
                                 n_frames=n_frames,
                                 rigidity_test_time_cutoff=args.val_rigidity_threshold)
+
+    elif args.mode == 'train_physics_gravity_warp':
+        runner.train_physics_gravity_warp()

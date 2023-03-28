@@ -91,6 +91,19 @@ python run.py --mode interpolate_<img_idx_0>_<img_idx_1> --conf <config_file> --
 
 The corresponding image set of view interpolation can be found in `exp/<case_name>/<exp_name>/render/`.
 
+- **Train physics parameters**
+Download the pretrained model weights on this [Google Drive](
+https://drive.google.com/file/d/1uyON8TfKojZ7ts1ZsrRrThEmKo9wlRqB/view?usp=share_link).
+
+Install [warp](https://github.com/NVIDIA/warp) for differentiable simulation.
+
+Run
+```shell
+python run.py --conf ./confs/womask.conf --case NeuS/custom/ball-motion3/preprocessed --mode train_physics_gravity_warp --is_continue
+```
+
+We are using warp because it runs on GPU and is much faster. We are also trying to provide the interface to [taichi](https://github.com/taichi-dev/taichi). 
+
 ## Train NeuPhysics with your own data
 
 More information can be found in [preprocess_custom_data](https://github.com/Totoro97/NeuS/tree/main/preprocess_custom_data).
